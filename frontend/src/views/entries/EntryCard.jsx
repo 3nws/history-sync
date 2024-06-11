@@ -39,7 +39,7 @@ export default function EntryCard({ entry }) {
   const handleChange = (event) => setText(event.target.value);
 
   return (
-    <Box sx={{ minWidth: 275 }}>
+    <Box sx={{ minWidth: 250 }}>
       <Card variant="outlined">
         <React.Fragment>
           <CardContent>
