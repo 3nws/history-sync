@@ -17,7 +17,6 @@ const Entries = () => {
     <>
       {((dataLoading || data == null) && <Loader />) || (
         <Masonry
-          container
           columns={{
             xs: 1,
             sm: 2,

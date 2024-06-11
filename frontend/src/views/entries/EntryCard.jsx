@@ -1,8 +1,6 @@
 import * as React from 'react';
-import Modal from '@mui/material/Modal';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import TextField from '@mui/material/TextField';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
@@ -11,19 +9,47 @@ import { OpenInNew } from '@mui/icons-material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useDeleteRecord, useUpdateRecord } from 'api/records';
+import { TextareaAutosize } from '@mui/base/TextareaAutosize';
+import { styled } from '@mui/system';
 
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: 400,
-  bgcolor: 'background.paper',
-  boxShadow: 24,
-  p: 4
-};
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import { useTheme } from '@emotion/react';
+
+const Textarea = styled(TextareaAutosize)(({ theme }) => ({
+  width: '320px',
+  [theme.breakpoints.up('md')]: {
+    width: '512px'
+  },
+  boxSizing: 'border-box',
+  fontFamily: `'IBM Plex Sans', sans-serif`,
+  fontSize: '1.875rem',
+  fontWeight: 400,
+  lineHeight: 1.5,
+  padding: '12px',
+  borderRadius: '12px 12px 0 12px',
+  color: theme.palette.grey[800],
+  background: theme.palette.background.paper,
+  border: `1px solid ${theme.palette.grey[200]}`,
+  boxShadow: `0px 2px 2px ${theme.palette.grey[50]}`,
+  '&:hover': {
+    borderColor: theme.palette.primary.main
+  },
+  '&:focus': {
+    outline: 0,
+    borderColor: theme.palette.primary.main,
+    boxShadow: `0 0 0 3px ${theme.palette.primary}`
+  },
+  '&:focus-visible': {
+    outline: 0
+  }
+}));
 
 export default function EntryCard({ entry }) {
+  const theme = useTheme();
+
   const [text, setText] = React.useState(entry.text);
   const [open, setOpen] = React.useState(false);
 
@@ -69,31 +95,27 @@ export default function EntryCard({ entry }) {
             >
               Edit
             </Button>
-            <Modal
-              open={open}
-              onClose={handleUpdate}
-              aria-labelledby={`modal-modal-title-${entry.id}`}
-              aria-describedby={`modal-modal-description-${entry.id}`}
-            >
-              <Box sx={style} component="form" noValidate autoComplete="off">
-                <Typography id={`modal-modal-title-${entry.id}`} variant="h6" component="h2">
-                  Update the record
-                </Typography>
-                <TextField
+            <Dialog open={open} onClose={handleUpdate}>
+              <DialogTitle>Update the record</DialogTitle>
+              <DialogContent>
+                <Textarea
                   sx={{ marginTop: '1em' }}
                   required
                   id={`text-${entry.id}`}
                   label="Text"
+                  minRows={3}
                   variant="outlined"
                   onChange={handleChange}
                   defaultValue={entry.text}
                 />
-                <div style={{ marginTop: '1em' }}>
-                  <Button onClick={handleUpdate}>Update</Button>
-                  <Button onClick={() => setOpen(false)}>Cancel</Button>
-                </div>
-              </Box>
-            </Modal>
+              </DialogContent>
+              <DialogActions>
+                <Button onClick={() => setOpen(false)}>Cancel</Button>
+                <Button sx={{ color: theme.palette.primary.dark }} onClick={handleUpdate}>
+                  Update
+                </Button>
+              </DialogActions>
+            </Dialog>
             <Button size="small" startIcon={<DeleteIcon />} color="error" onClick={handleDelete}>
               Delete
             </Button>
