@@ -50,13 +50,15 @@ export class RecordService {
     const records: Record[] = [];
 
     for (const dto of createRecordBulkDto.entries) {
-      if (!dto.text.trim()) return null;
+      if (!dto.text.trim()) continue;
       const record_existing = await this.recordRepository.findOneBy({
         text: dto.text,
       });
+
       if (record_existing) {
         await this.recordRepository.remove(record_existing);
       }
+
       const record = this.recordRepository.create(dto);
       records.push(record);
     }
