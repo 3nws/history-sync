@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Action } from 'src/helpers/actions';
+import { Action } from 'src/helpers/actions.enum';
 import { Record } from 'src/record/record.entity';
 import { User } from 'src/users/users.entity';
 import {

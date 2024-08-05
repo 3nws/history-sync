@@ -17,14 +17,18 @@ import { CreateRecordBulkDto } from './dto/create-bulk.dto';
 import { UpdateRecordDto } from './dto/update.dto';
 import { EmailPassAuthGuard, JwtAuthGuard } from 'src/auth/guards';
 import { User } from 'src/users/users.entity';
-import { GetUser } from 'src/helpers/get-user';
+import { GetUser } from 'src/helpers/get-user.decorator';
+import { Role } from 'src/helpers/role/role.enum';
+import { Roles } from 'src/helpers/role/roles.decorator';
+import { RolesGuard } from 'src/helpers/role/roles.guard';
 
 @Controller('/api/record')
 export class RecordController {
   constructor(private readonly recordService: RecordService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.Admin)
   findAll(@GetUser() user: User): Promise<Record[]> {
     return this.recordService.findAll(user);
   }

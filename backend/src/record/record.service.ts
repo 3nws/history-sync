@@ -12,7 +12,7 @@ import { CreateRecordBulkDto } from './dto/create-bulk.dto';
 import { UpdateRecordDto } from './dto/update.dto';
 import { User } from 'src/users/users.entity';
 import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.factory';
-import { Action } from 'src/helpers/actions';
+import { Action } from 'src/helpers/actions.enum';
 
 @Injectable()
 export class RecordService {

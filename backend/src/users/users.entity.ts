@@ -1,3 +1,4 @@
+import { Role } from 'src/helpers/role/role.enum';
 import { RefreshToken } from 'src/refresh-token/refresh-token.entity';
 import {
   Entity,
@@ -27,6 +28,9 @@ export class User {
 
   @Column({ name: 'password', length: 255 })
   password: string;
+
+  @Column({ name: 'roles', type: 'json', nullable: true })
+  roles: Role[];
 
   @CreateDateColumn()
   created_at: Date;

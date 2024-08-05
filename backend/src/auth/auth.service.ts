@@ -30,13 +30,14 @@ export class AuthService {
     if (!user || !(await bcrypt.compare(password, user.password)))
       throw new BadRequestException('User not found!');
 
-    const { firstName, lastName, id } = user;
+    const { firstName, lastName, id, roles } = user;
 
     const payload = {
       firstName,
       lastName,
       id,
       email,
+      roles,
     };
 
     const refreshToken = this.jwtService.sign(payload, {
@@ -73,7 +74,7 @@ export class AuthService {
       throw new ForbiddenException();
     }
 
-    const { firstName, lastName, id, email } = user;
+    const { firstName, lastName, id, email, roles } = user;
 
     this.jwtService.verify(refreshToken);
 
@@ -82,6 +83,7 @@ export class AuthService {
       lastName,
       id,
       email,
+      roles,
     };
 
     return { accessToken: this.jwtService.sign(payload), refreshToken };

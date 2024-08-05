@@ -70,7 +70,7 @@ base.interceptors.response.use(
 
         if (status !== 401 && url !== 'auth/refresh') {
           if (message) {
-            const key = status === 404 ? `_apiMessages.notFound` : `_apiMessages.${message}`;
+            const key = status === 404 ? 'Not Found.' : message;
 
             toast.warning(key);
           } else {
