@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateRecordDto } from './dto/create.dto';
@@ -62,7 +67,8 @@ export class RecordService {
     const ability = this.caslAbilityFactory.createForUser(user);
     const record = await this.recordRepository.findOneBy({ id });
 
-    if (ability.cannot(Action.Manage, record)) return null;
+    if (ability.cannot(Action.Manage, record))
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
 
     record.text = updateRecordDto.text;
     return await this.recordRepository.save(record);
@@ -89,7 +95,13 @@ export class RecordService {
     return await this.recordRepository.save(records);
   }
 
-  async remove(id: number) {
+  async remove(user: User, id: number) {
+    const ability = this.caslAbilityFactory.createForUser(user);
+    const record = await this.recordRepository.findOneBy({ id });
+
+    if (ability.cannot(Action.Delete, record))
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+
     const result = await this.recordRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`A record "${id}" was not found`);

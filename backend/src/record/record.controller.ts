@@ -17,7 +17,7 @@ import { CreateRecordBulkDto } from './dto/create-bulk.dto';
 import { UpdateRecordDto } from './dto/update.dto';
 import { EmailPassAuthGuard, JwtAuthGuard } from 'src/auth/guards';
 import { User } from 'src/users/users.entity';
-import { GetUser } from 'src/helpers/getUser';
+import { GetUser } from 'src/helpers/get-user';
 
 @Controller('/api/record')
 export class RecordController {
@@ -43,15 +43,12 @@ export class RecordController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
-  async update(
+  update(
     @GetUser() user: User,
     @Param('id') id: number,
     @Body() updateRecordDto: UpdateRecordDto,
   ): Promise<Record> {
-    const res = await this.recordService.update(user, id, updateRecordDto);
-
-    if (!res) throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
-    return res;
+    return this.recordService.update(user, id, updateRecordDto);
   }
 
   @Post('bulk')
@@ -64,7 +61,7 @@ export class RecordController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
-  remove(@Param('id') id: number) {
-    return this.recordService.remove(id);
+  remove(@GetUser() user: User, @Param('id') id: number) {
+    return this.recordService.remove(user, id);
   }
 }
