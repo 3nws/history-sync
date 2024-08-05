@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import { toast } from 'react-toastify';
+
 const base = axios.create({
   baseURL: `${import.meta.env.VITE_NEST_API_URL}/api/`
 });
@@ -7,17 +9,17 @@ const base = axios.create({
 base.defaults.headers.common = {
   'Content-Type': 'application/json',
   Accept: 'application/json',
-  'ngrok-skip-browser-warning': 'true',
+  'ngrok-skip-browser-warning': 'true'
 };
 
 base.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem('accessToken');
 
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-    
+
     return config;
   },
   (error) => {
@@ -39,22 +41,22 @@ base.interceptors.response.use(
 
         try {
           const rs = await base.post('auth/refresh', {
-            accessToken: localStorage.getItem("accessToken"),
-            refreshToken: localStorage.getItem("refreshToken"),
+            accessToken: localStorage.getItem('accessToken'),
+            refreshToken: localStorage.getItem('refreshToken')
           });
 
           const data = rs.data;
           const { accessToken, refreshToken } = data;
 
-          localStorage.setItem("accessToken", accessToken);
-          localStorage.setItem("refreshToken", refreshToken);
+          localStorage.setItem('accessToken', accessToken);
+          localStorage.setItem('refreshToken', refreshToken);
 
           return base(originalConfig);
         } catch (_error) {
           toast.error('Session time out');
 
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
 
           window.location.href = `${window.location.origin}/login`;
 
@@ -68,14 +70,11 @@ base.interceptors.response.use(
 
         if (status !== 401 && url !== 'auth/refresh') {
           if (message) {
-            const key =
-              status === 404
-                ? `_apiMessages.notFound`
-                : `_apiMessages.${message}`;
+            const key = status === 404 ? `_apiMessages.notFound` : `_apiMessages.${message}`;
 
-            toast.warning(t(key));
+            toast.warning(key);
           } else {
-            toast.error("Unexpected error!");
+            toast.error('Unexpected error!');
           }
         }
       }

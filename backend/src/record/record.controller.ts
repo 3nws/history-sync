@@ -7,6 +7,8 @@ import {
   Body,
   Put,
   UseGuards,
+  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { RecordService } from './record.service';
 import { Record } from './record.entity';
@@ -14,6 +16,8 @@ import { CreateRecordDto } from './dto/create.dto';
 import { CreateRecordBulkDto } from './dto/create-bulk.dto';
 import { UpdateRecordDto } from './dto/update.dto';
 import { EmailPassAuthGuard, JwtAuthGuard } from 'src/auth/guards';
+import { User } from 'src/users/users.entity';
+import { GetUser } from 'src/helpers/getUser';
 
 @Controller('/api/record')
 export class RecordController {
@@ -21,8 +25,8 @@ export class RecordController {
 
   @Get()
   @UseGuards(JwtAuthGuard)
-  findAll(): Promise<Record[]> {
-    return this.recordService.findAll();
+  findAll(@GetUser() user: User): Promise<Record[]> {
+    return this.recordService.findAll(user);
   }
 
   @Get(':id')
@@ -39,11 +43,15 @@ export class RecordController {
 
   @Put(':id')
   @UseGuards(JwtAuthGuard)
-  update(
+  async update(
+    @GetUser() user: User,
     @Param('id') id: number,
     @Body() updateRecordDto: UpdateRecordDto,
   ): Promise<Record> {
-    return this.recordService.update(id, updateRecordDto);
+    const res = await this.recordService.update(user, id, updateRecordDto);
+
+    if (!res) throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    return res;
   }
 
   @Post('bulk')

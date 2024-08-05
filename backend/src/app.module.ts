@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { RefreshToken } from './refresh-token/refresh-token.entity';
 import { User } from './users/users.entity';
 import { ConfigModule } from '@nestjs/config';
+import { CaslModule } from './casl/casl.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ConfigModule } from '@nestjs/config';
     RecordModule,
     AuthModule,
     UsersModule,
+    CaslModule,
   ],
   controllers: [],
   providers: [],

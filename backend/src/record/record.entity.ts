@@ -19,4 +19,10 @@ export class Record {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @Column({ name: 'authorId', nullable: true })
+  authorId: number;
+
+  @Column({ name: 'isPublished', default: false })
+  isPublished: boolean;
 }

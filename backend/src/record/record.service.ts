@@ -5,16 +5,31 @@ import { CreateRecordDto } from './dto/create.dto';
 import { Record } from './record.entity';
 import { CreateRecordBulkDto } from './dto/create-bulk.dto';
 import { UpdateRecordDto } from './dto/update.dto';
+import { User } from 'src/users/users.entity';
+import { CaslAbilityFactory } from 'src/casl/casl-ability.factory/casl-ability.factory';
+import { Action } from 'src/helpers/actions';
 
 @Injectable()
 export class RecordService {
   constructor(
     @InjectRepository(Record)
     private readonly recordRepository: Repository<Record>,
+    private caslAbilityFactory: CaslAbilityFactory,
   ) {}
 
-  async findAll(): Promise<Record[]> {
-    return await this.recordRepository.find({ order: { id: 'DESC' } });
+  async findAll(user: User): Promise<Record[]> {
+    const ability = this.caslAbilityFactory.createForUser(user);
+
+    const records = await this.recordRepository.find({
+      order: { id: 'DESC' },
+    });
+
+    // Filter records based on the ability
+    const readableRecords = records.filter((record) =>
+      ability.can(Action.Read, record),
+    );
+
+    return readableRecords;
   }
 
   async findOne(id: number): Promise<Record> {
@@ -37,9 +52,18 @@ export class RecordService {
     return await this.recordRepository.save(record);
   }
 
-  async update(id: number, updateRecordDto: UpdateRecordDto): Promise<Record> {
+  async update(
+    user: User,
+    id: number,
+    updateRecordDto: UpdateRecordDto,
+  ): Promise<Record> {
     if (!updateRecordDto.text.trim()) return null;
+
+    const ability = this.caslAbilityFactory.createForUser(user);
     const record = await this.recordRepository.findOneBy({ id });
+
+    if (ability.cannot(Action.Manage, record)) return null;
+
     record.text = updateRecordDto.text;
     return await this.recordRepository.save(record);
   }
